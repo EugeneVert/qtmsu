@@ -3,8 +3,8 @@
 #include <iostream>
 #include <QProcess>
 
-TmsuManage::TmsuManage(QString itemName)
-    : itemName(itemName)
+TmsuManage::TmsuManage(QStringList itemNames)
+    : itemNames(itemNames)
 {
     {
         // Get all tags (without values)
@@ -21,13 +21,20 @@ TmsuManage::TmsuManage(QString itemName)
         QProcess p;
         p.start("tmsu",
                 QStringList() << "tags"
+                              << "-1"
                               << "-n"
-                              << "never" << itemName);
+                              << "never" << itemNames);
         p.waitForFinished();
-        itemTags = QString(p.readAllStandardOutput()).split("\n", Qt::SkipEmptyParts);
+
+        foreach (const QString &tag, QString(p.readAllStandardOutput()).split("\n")) {
+            if (tag == "") {
+                continue;
+            }
+            itemsTags[tag] += 1;
+        }
     }
     // Append tags with values to dbTags
-    for (const QString &tag : qAsConst(itemTags)) {
+    foreach (const auto &tag, itemsTags.keys()) {
         if (tag.contains("=")) {
             dbTags << tag;
         }
@@ -36,35 +43,20 @@ TmsuManage::TmsuManage(QString itemName)
 
 TmsuManage::~TmsuManage() {}
 
-void TmsuManage::UpdateTags(QStringList itemTagsNew)
+void TmsuManage::UpdateTags(QStringList checked, QStringList unchecked)
 {
-    QStringList toDel;
-    QStringList toAdd;
-    bool itemIsOld, itemIsNew, itemToDelete;
-
-    for (const QString &ln : itemTagsNew) {
-        if (!itemTags.contains(ln)) {
-            toAdd << ln;
-        }
-    }
     {
         QProcess p;
         p.start("tmsu",
                 QStringList() << "tag"
-                              << "-t" << toAdd.join(" ") << itemName);
+                              << "-t" << checked.join(" ") << itemNames);
         p.waitForFinished();
-    }
-
-    for (const QString &l : qAsConst(itemTags)) {
-        if (!itemTagsNew.contains(l)) {
-            toDel << l;
-        }
     }
     {
         QProcess p;
         p.start("tmsu",
                 QStringList() << "untag"
-                              << "-t" << toDel.join(" ") << itemName);
+                              << "-t" << unchecked.join(" ") << itemNames);
         p.waitForFinished();
     }
 }

@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "tmsumanage.h"
+#include "ui_mainwindow.h"
 
 #include <KListWidgetSearchLine>
 #include <QCompleter>
@@ -12,8 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    tmsu = new TmsuManage(QCoreApplication::arguments().at(1));
-    addTags(tmsu->dbTags, tmsu->itemTags);
+    QStringList arguments = QCoreApplication::arguments();
+    tmsu = new TmsuManage(arguments.mid(1, arguments.length()));
+    addTags(tmsu->dbTags, tmsu->itemsTags, arguments.size() - 1);
 
     comp = new QCompleter(tmsu->dbTags);
     comp->setCompletionMode(QCompleter::PopupCompletion);
@@ -45,14 +46,18 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
-void MainWindow::addTags(QStringList &dbTags, QStringList &itemTags)
+void MainWindow::addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen)
 {
+    uint count;
     for (const QString &i : dbTags) {
         QListWidgetItem *item = new QListWidgetItem(i);
-        if (itemTags.contains(i)) {
+        count = itemTags.value(i, 0);
+        if (count == 0) {
+            item->setCheckState(Qt::Unchecked);
+        } else if (count == argsLen) {
             item->setCheckState(Qt::Checked);
         } else {
-            item->setCheckState(Qt::Unchecked);
+            item->setCheckState(Qt::PartiallyChecked);
         }
         ui->listWidget->addItem(item);
     }
@@ -60,9 +65,14 @@ void MainWindow::addTags(QStringList &dbTags, QStringList &itemTags)
 
 void MainWindow::on_klistwidgetsearchline_returnPressed()
 {
-    for (int i = 0; i < ui->listWidget->count(); i++) {
-        QListWidgetItem *item = ui->listWidget->item(i);
-        if (ui->klistwidgetsearchline->text() == item->text()) {
+    if (ui->klistwidgetsearchline->text() == "") {
+        return;
+    }
+
+    const auto foundItems = ui->listWidget->findItems(ui->klistwidgetsearchline->text(),
+                                                      Qt::MatchFixedString);
+    if (!foundItems.empty()) {
+        if (QListWidgetItem *item = foundItems.at(0)) {
             if (item->checkState() == Qt::Unchecked) {
                 item->setCheckState(Qt::Checked);
                 ui->klistwidgetsearchline->clear();
@@ -73,9 +83,7 @@ void MainWindow::on_klistwidgetsearchline_returnPressed()
             return;
         }
     }
-    if (ui->klistwidgetsearchline->text() == "") {
-        return;
-    }
+
     QListWidgetItem *item = new QListWidgetItem(ui->klistwidgetsearchline->text());
     item->setCheckState(Qt::Checked);
     ui->listWidget->addItem(item);
@@ -84,13 +92,19 @@ void MainWindow::on_klistwidgetsearchline_returnPressed()
 
 void MainWindow::on_applyButton_clicked()
 {
-    QStringList l;
+    QStringList checked;
+    QStringList unchecked;
     QListWidgetItem *item;
+    Qt::CheckState state;
+    uint statei;
     for (int i = 0; i < ui->listWidget->count(); i++) {
         item = ui->listWidget->item(i);
-        if (item->checkState() == Qt::Checked) {
-            l << item->text();
+        state = item->checkState();
+        if (state == Qt::Checked) {
+            checked << item->text();
+        } else if (state == Qt::Unchecked) {
+            unchecked << item->text();
         }
     }
-    tmsu->UpdateTags(l);
+    tmsu->UpdateTags(checked, unchecked);
 }

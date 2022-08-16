@@ -5,8 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-    assert(argc == 2);
-    if (argc != 2) {
+    if (argc < 2) {
         printf("Usage: %s [file_name]", argv[0]);
         return 1;
     }

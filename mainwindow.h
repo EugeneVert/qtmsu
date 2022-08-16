@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
 #include <QMainWindow>
 class QCompleter;
 class TmsuManage;
@@ -18,10 +17,11 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    void addTags(QStringList &dbTags, QStringList &itemTags);
+    ~MainWindow();
+
     TmsuManage *tmsu;
     QCompleter *comp;
-    ~MainWindow();
+    void addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

@@ -1,20 +1,28 @@
 #ifndef TMSUMANAGE_H
 #define TMSUMANAGE_H
 
+#include <QMap>
 #include <QStringList>
+
+enum ItemTagState {
+    OFF = 1 << 0,
+    ON = 1 << 1,
+    PARTIAL = 3,
+};
 
 class TmsuManage
 {
 public:
-    TmsuManage(QString itemName);
+    TmsuManage(QStringList itemNames);
     ~TmsuManage();
-    void UpdateTags(QStringList itemTagsNew);
+
+    //    QStringList itemValueTags;
     QStringList dbTags;
-    QStringList itemTags;
-//    QStringList itemValueTags;
+    QMap<QString, uint> itemsTags;
+    void UpdateTags(QStringList checked, QStringList unchecked);
 
 private:
-    QString itemName;
+    QStringList itemNames;
 };
 
 #endif // TMSUMANAGE_H
