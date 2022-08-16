@@ -21,6 +21,9 @@ public:
 
     TmsuManage *tmsu;
     QCompleter *comp;
+    QCompleter *argumentComp;
+    bool compEnabled;
+    uint preArgumentLen;
     void addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen);
     void installCompleter();
     void removeCompleter();
@@ -32,6 +35,8 @@ private slots:
     void on_klistwidgetsearchline_returnPressed();
     void on_applyButton_clicked();
     void on_checkBox_stateChanged(int arg1);
+
+    void on_klistwidgetsearchline_textChanged(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;

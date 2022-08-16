@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "qnamespace.h"
 #include "tmsumanage.h"
 #include "ui_mainwindow.h"
 
@@ -23,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->klistwidgetsearchline->setListWidget(ui->listWidget);
     ui->klistwidgetsearchline->installEventFilter(this);
+    installCompleter();
 }
 
 MainWindow::~MainWindow()
@@ -120,11 +120,13 @@ void MainWindow::on_applyButton_clicked()
 
 void MainWindow::installCompleter()
 {
+    compEnabled = true;
     ui->klistwidgetsearchline->setCompleter(comp);
 }
 
 void MainWindow::removeCompleter()
 {
+    compEnabled = false;
     ui->klistwidgetsearchline->setCompleter(nullptr);
 }
 
@@ -134,5 +136,26 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
         removeCompleter();
     } else {
         installCompleter();
+    }
+}
+
+void MainWindow::on_klistwidgetsearchline_textChanged(const QString &arg1)
+{
+    if (!compEnabled) {
+        return;
+    }
+    uint len = arg1.length();
+    if (arg1.endsWith("=")) {
+        preArgumentLen = len - 1;
+        const QString &mid = arg1.mid(0, preArgumentLen);
+        QStringList values = tmsu->GetTagArguments(mid);
+        for (auto &i : values) {
+            i = arg1 + i;
+        }
+        argumentComp = new QCompleter(values);
+        ui->klistwidgetsearchline->setCompleter(argumentComp);
+    }
+    if (preArgumentLen != 0 && len < preArgumentLen) {
+        ui->klistwidgetsearchline->setCompleter(comp);
     }
 }

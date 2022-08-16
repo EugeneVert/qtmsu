@@ -1,8 +1,5 @@
 #include "tmsumanage.h"
 
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
 #include <QProcess>
 
 TmsuManage::TmsuManage(QStringList itemNames)
@@ -73,4 +70,18 @@ void TmsuManage::UpdateTags(QStringList checked, QStringList unchecked)
                               << "-t" << toDel.join(" ") << itemNames);
         p.waitForFinished();
     }
+}
+
+QStringList TmsuManage::GetTagArguments(const QString &tag)
+{
+    QStringList res;
+    {
+        QProcess p;
+        p.start("tmsu",
+                QStringList() << "values"
+                              << "-1" << tag);
+        p.waitForFinished();
+        res = QString(p.readAllStandardOutput()).split("\n", Qt::SkipEmptyParts);
+    }
+    return res;
 }
