@@ -1,8 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <KListWidgetSearchLine>
+
 #include <QMainWindow>
+class QCompleter;
+class TmsuManage;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,9 +18,17 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    void addTags(QStringList &dbTags, QStringList &itemTags);
+    TmsuManage *tmsu;
+    QCompleter *comp;
     ~MainWindow();
 
-    void addCheckmarks();
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+
+private slots:
+    void on_klistwidgetsearchline_returnPressed();
+    void on_applyButton_clicked();
 
 private:
     Ui::MainWindow *ui;
