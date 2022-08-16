@@ -72,3 +72,4 @@ Thumbs.db
 *.exe
 
 /build*
+/main1.cpp

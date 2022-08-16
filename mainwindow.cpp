@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "qnamespace.h"
 #include "tmsumanage.h"
 #include "ui_mainwindow.h"
 
@@ -11,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->centralwidget->installEventFilter(this);
 
     QStringList arguments = QCoreApplication::arguments();
     tmsu = new TmsuManage(arguments.mid(1, arguments.length()));
@@ -33,16 +35,24 @@ MainWindow::~MainWindow()
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if (obj == ui->klistwidgetsearchline && event->type() == QEvent::KeyPress) {
+    if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (Qt::Key_Return == keyEvent->key()) {
-            if (Qt::Modifier::CTRL == keyEvent->modifiers()) {
-                on_applyButton_clicked();
+        if (obj == ui->centralwidget) {
+            if (Qt::Key_Escape == keyEvent->key()) {
                 close();
             }
-            on_klistwidgetsearchline_returnPressed();
+        } else if (obj == ui->klistwidgetsearchline) {
+            if (Qt::Key_Return == keyEvent->key()) {
+                if (Qt::Modifier::CTRL == keyEvent->modifiers()
+                    | Qt::Modifier::SHIFT == keyEvent->modifiers()) {
+                    on_applyButton_clicked();
+                    close();
+                }
+                on_klistwidgetsearchline_returnPressed();
+            }
         }
     }
+
     return false;
 }
 
