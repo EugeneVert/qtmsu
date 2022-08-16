@@ -23,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->klistwidgetsearchline->setListWidget(ui->listWidget);
     ui->klistwidgetsearchline->installEventFilter(this);
-    ui->klistwidgetsearchline->setCompleter(comp);
 }
 
 MainWindow::~MainWindow()
@@ -83,7 +82,7 @@ void MainWindow::on_klistwidgetsearchline_returnPressed()
                                                       Qt::MatchFixedString);
     if (!foundItems.empty()) {
         if (QListWidgetItem *item = foundItems.at(0)) {
-            if (item->checkState() == Qt::Unchecked) {
+            if (item->checkState() != Qt::Checked) {
                 item->setCheckState(Qt::Checked);
                 ui->klistwidgetsearchline->clear();
                 return;
@@ -117,4 +116,23 @@ void MainWindow::on_applyButton_clicked()
         }
     }
     tmsu->UpdateTags(checked, unchecked);
+}
+
+void MainWindow::installCompleter()
+{
+    ui->klistwidgetsearchline->setCompleter(comp);
+}
+
+void MainWindow::removeCompleter()
+{
+    ui->klistwidgetsearchline->setCompleter(nullptr);
+}
+
+void MainWindow::on_checkBox_stateChanged(int arg1)
+{
+    if (arg1 == 0) {
+        removeCompleter();
+    } else {
+        installCompleter();
+    }
 }

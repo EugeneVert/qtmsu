@@ -1,5 +1,7 @@
 #include "tmsumanage.h"
 
+#include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <QProcess>
 
@@ -14,7 +16,11 @@ TmsuManage::TmsuManage(QStringList itemNames)
                               << "-1");
         p.waitForFinished();
         dbTags = QString(p.readAllStandardOutput()).split("\n", Qt::SkipEmptyParts);
-        assert(!dbTags.isEmpty());
+        auto err = p.readAllStandardError();
+        if (!err.isEmpty()) {
+            fprintf(stderr, "TMSU database not found\n");
+            exit(1);
+        }
     }
     {
         // Get item tags (with values)
@@ -52,11 +58,19 @@ void TmsuManage::UpdateTags(QStringList checked, QStringList unchecked)
                               << "-t" << checked.join(" ") << itemNames);
         p.waitForFinished();
     }
+
+    QStringList toDel;
+    foreach (const auto &i, itemsTags.keys()) {
+        if (unchecked.contains(i)) {
+            toDel << i;
+        }
+    }
+
     {
         QProcess p;
         p.start("tmsu",
                 QStringList() << "untag"
-                              << "-t" << unchecked.join(" ") << itemNames);
+                              << "-t" << toDel.join(" ") << itemNames);
         p.waitForFinished();
     }
 }

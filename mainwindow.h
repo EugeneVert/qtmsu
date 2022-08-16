@@ -22,6 +22,8 @@ public:
     TmsuManage *tmsu;
     QCompleter *comp;
     void addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen);
+    void installCompleter();
+    void removeCompleter();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -29,6 +31,7 @@ protected:
 private slots:
     void on_klistwidgetsearchline_returnPressed();
     void on_applyButton_clicked();
+    void on_checkBox_stateChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;
