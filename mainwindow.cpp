@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QShortcut *shortcut = new QShortcut(QKeySequence(tr("Alt+Shift+A", "Show only active")), this);
     connect(shortcut, &QShortcut::activated, this, &MainWindow::on_showOnlyActive);
+    on_showOnlyActive();
 }
 
 MainWindow::~MainWindow()
@@ -62,6 +63,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 void MainWindow::on_showOnlyActive()
 {
     showOnlyActive = !showOnlyActive;
+    updateListWidgetActive();
+}
+
+void MainWindow::updateListWidgetActive()
+{
     for (int i = 0; i < ui->listWidget->count(); i++) {
         auto *item = ui->listWidget->item(i);
         if (item->checkState() == Qt::CheckState::Unchecked) {
@@ -93,7 +99,7 @@ void MainWindow::addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uin
 
 void MainWindow::on_klistwidgetsearchline_returnPressed()
 {
-    if (ui->klistwidgetsearchline->text() == "") {
+    if (ui->klistwidgetsearchline->text().isEmpty()) {
         return;
     }
 
@@ -103,19 +109,19 @@ void MainWindow::on_klistwidgetsearchline_returnPressed()
         if (QListWidgetItem *item = foundItems.at(0)) {
             if (item->checkState() != Qt::Checked) {
                 item->setCheckState(Qt::Checked);
-                ui->klistwidgetsearchline->clear();
-                return;
+            } else {
+                item->setCheckState(Qt::Unchecked);
             }
-            item->setCheckState(Qt::Unchecked);
-            ui->klistwidgetsearchline->clear();
-            return;
         }
+    } else {
+        QListWidgetItem *item = new QListWidgetItem(ui->klistwidgetsearchline->text());
+        item->setCheckState(Qt::Checked);
+        ui->listWidget->addItem(item);
     }
 
-    QListWidgetItem *item = new QListWidgetItem(ui->klistwidgetsearchline->text());
-    item->setCheckState(Qt::Checked);
-    ui->listWidget->addItem(item);
-    ui->klistwidgetsearchline->clear();
+    ui->klistwidgetsearchline->updateSearch("");
+    ui->klistwidgetsearchline->selectAll();
+    updateListWidgetActive();
 }
 
 void MainWindow::on_applyButton_clicked()
@@ -160,6 +166,10 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
 
 void MainWindow::on_klistwidgetsearchline_textChanged(const QString &arg1)
 {
+    if (arg1.isEmpty()) {
+        // TODO(eugene): find a way to do updateListWidgetActive();
+        return;
+    }
     if (!compEnabled) {
         return;
     }
