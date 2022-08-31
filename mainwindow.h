@@ -22,8 +22,9 @@ public:
     TmsuManage *tmsu;
     QCompleter *comp;
     QCompleter *argumentComp;
-    bool compEnabled;
-    uint preArgumentLen;
+    bool compEnabled = false;
+    bool showOnlyActive = false;
+    uint preArgumentLen = 0;
     void addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen);
     void installCompleter();
     void removeCompleter();
@@ -32,6 +33,7 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
+    void on_showOnlyActive();
     void on_klistwidgetsearchline_returnPressed();
     void on_applyButton_clicked();
     void on_checkBox_stateChanged(int arg1);

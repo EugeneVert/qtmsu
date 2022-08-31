@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -105,7 +108,7 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>56</height>
+        <height>64</height>
        </size>
       </property>
       <property name="font">
@@ -139,7 +142,8 @@
       </property>
       <property name="plainText">
        <string>&lt;CR&gt; to toggle the tag
-&lt;C-CR&gt; to apply</string>
+&lt;C-CR&gt; to apply
+&lt;Alt+Shit+A&gt; to show only active</string>
       </property>
       <property name="backgroundVisible">
        <bool>false</bool>
@@ -149,6 +153,9 @@
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -158,7 +165,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
   <customwidget>

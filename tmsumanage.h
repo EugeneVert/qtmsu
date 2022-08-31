@@ -20,7 +20,7 @@ public:
     QStringList dbTags;
     QMap<QString, uint> itemsTags;
     void UpdateTags(QStringList checked, QStringList unchecked);
-    QStringList GetTagArguments(const QString &tag);
+    QStringList GetTagValues(const QString &tag);
 
 private:
     QStringList itemNames;

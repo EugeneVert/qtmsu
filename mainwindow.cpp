@@ -5,6 +5,7 @@
 #include <KListWidgetSearchLine>
 #include <QCompleter>
 #include <QKeyEvent>
+#include <QShortcut>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,12 +18,15 @@ MainWindow::MainWindow(QWidget *parent)
     tmsu = new TmsuManage(arguments.mid(1, arguments.length()));
     addTags(tmsu->dbTags, tmsu->itemsTags, arguments.size() - 1);
 
-    comp = new QCompleter(tmsu->dbTags);
+    comp = new QCompleter(tmsu->dbTags, this);
     comp->setCompletionMode(QCompleter::PopupCompletion);
 
     ui->klistwidgetsearchline->setListWidget(ui->listWidget);
     ui->klistwidgetsearchline->installEventFilter(this);
     installCompleter();
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Alt+Shift+A", "Show only active")), this);
+    connect(shortcut, &QShortcut::activated, this, &MainWindow::on_showOnlyActive);
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +57,21 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     }
 
     return false;
+}
+
+void MainWindow::on_showOnlyActive()
+{
+    showOnlyActive = !showOnlyActive;
+    for (int i = 0; i < ui->listWidget->count(); i++) {
+        auto *item = ui->listWidget->item(i);
+        if (item->checkState() == Qt::CheckState::Unchecked) {
+            if (showOnlyActive) {
+                item->setHidden(true);
+            } else {
+                item->setHidden(false);
+            }
+        }
+    }
 }
 
 void MainWindow::addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen)
@@ -148,7 +167,7 @@ void MainWindow::on_klistwidgetsearchline_textChanged(const QString &arg1)
     if (arg1.endsWith("=")) {
         preArgumentLen = len - 1;
         const QString &mid = arg1.mid(0, preArgumentLen);
-        QStringList values = tmsu->GetTagArguments(mid);
+        QStringList values = tmsu->GetTagValues(mid);
         for (auto &i : values) {
             i = arg1 + i;
         }

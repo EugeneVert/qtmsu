@@ -72,7 +72,7 @@ void TmsuManage::UpdateTags(QStringList checked, QStringList unchecked)
     }
 }
 
-QStringList TmsuManage::GetTagArguments(const QString &tag)
+QStringList TmsuManage::GetTagValues(const QString &tag)
 {
     QStringList res;
     {
