@@ -143,7 +143,7 @@
       <property name="plainText">
        <string>&lt;CR&gt; to toggle the tag
 &lt;C-CR&gt; to apply
-&lt;Alt+Shit+A&gt; to show only active</string>
+&lt;Alt+Shift+A&gt; to show only active</string>
       </property>
       <property name="backgroundVisible">
        <bool>false</bool>
