@@ -28,7 +28,9 @@ public:
     void addTags(QStringList &dbTags, QMap<QString, uint> &itemTags, uint argsLen);
     void installCompleter();
     void removeCompleter();
+    void updateCompleter();
     void updateListWidgetActive();
+
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

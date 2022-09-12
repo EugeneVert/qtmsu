@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon::fromTheme("folder-tag"));
     MainWindow w;
     w.show();
     return a.exec();

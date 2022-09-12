@@ -122,6 +122,7 @@ void MainWindow::on_klistwidgetsearchline_returnPressed()
     ui->klistwidgetsearchline->updateSearch("");
     ui->klistwidgetsearchline->selectAll();
     updateListWidgetActive();
+    updateCompleter();
 }
 
 void MainWindow::on_applyButton_clicked()
@@ -141,6 +142,7 @@ void MainWindow::on_applyButton_clicked()
         }
     }
     tmsu->UpdateTags(checked, unchecked);
+
 }
 
 void MainWindow::installCompleter()
@@ -155,6 +157,15 @@ void MainWindow::removeCompleter()
     ui->klistwidgetsearchline->setCompleter(nullptr);
 }
 
+void MainWindow::updateCompleter()
+{
+    if (compEnabled) {
+        ui->klistwidgetsearchline->setCompleter(comp);
+    } else {
+        ui->klistwidgetsearchline->setCompleter(nullptr);
+    }
+}
+
 void MainWindow::on_checkBox_stateChanged(int arg1)
 {
     if (arg1 == 0) {
@@ -166,10 +177,6 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
 
 void MainWindow::on_klistwidgetsearchline_textChanged(const QString &arg1)
 {
-    if (arg1.isEmpty()) {
-        // TODO(eugene): find a way to do updateListWidgetActive();
-        return;
-    }
     if (!compEnabled) {
         return;
     }
