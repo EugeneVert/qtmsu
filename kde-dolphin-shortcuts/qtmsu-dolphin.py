@@ -8,7 +8,7 @@ import pyperclip
 
 
 def main():
-    run(["xdotool", "getactivewindow", "key", "ctrl+c"])
+    run(["xdotool", "sleep", "0.25", "getactivewindow", "key", "ctrl+c"])
     c = pyperclip.paste().splitlines()
     for i in range(len(c)):
         c[i] = unquote(urlparse(c[i]).path)
